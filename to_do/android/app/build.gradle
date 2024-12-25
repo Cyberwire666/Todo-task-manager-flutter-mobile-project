@@ -1,0 +1,43 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'  // This applies the Google services plugin
+
+android {
+    compileSdkVersion 33 // Set to the latest supported version
+
+    defaultConfig {
+        applicationId "com.example.to_do"  
+        minSdkVersion 21
+        targetSdkVersion 33 // Set to the latest supported version
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // For Firebase Performance Plugin and Google Services
+    packagingOptions {
+        pickFirst 'META-INF/proguard/androidx-annotations.pro'
+    }
+}
+
+dependencies {
+    implementation platform('com.google.firebase:firebase-bom:33.7.0')
+
+    // Firebase SDKs
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+
+    // Flutter and other dependencies
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.google.android.material:material:1.6.1'
+
+    // For using Kotlin (if required)
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.10"
+}

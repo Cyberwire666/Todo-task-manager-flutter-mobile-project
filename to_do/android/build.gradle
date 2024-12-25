@@ -1,0 +1,25 @@
+buildscript {
+    repositories {
+        google()  // Ensure Google repository is added
+        mavenCentral() // For other dependencies
+    }
+    dependencies {
+        // The classpath for the Android Gradle Plugin (AGP)
+        classpath 'com.android.tools.build:gradle:7.3.0'
+        
+        // The classpath for Google Services (must be applied in the app-level build.gradle)
+        classpath 'com.google.gms:google-services:4.4.2'  // Update to the latest version if necessary
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()  // Can be removed later as it's deprecated
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
