@@ -5,8 +5,7 @@ import '../services/task_service.dart';
 class TaskList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Fetch tasks from TaskService using Provider
-    List<Task> tasks = context.watch<TaskService>().tasks;
+    final tasks = context.watch<TaskService>().tasks;
 
     if (tasks.isEmpty) {
       return const Center(
@@ -20,8 +19,7 @@ class TaskList extends StatelessWidget {
     return ListView.builder(
       itemCount: tasks.length,
       itemBuilder: (context, index) {
-        var task = tasks[index];
-
+        final task = tasks[index];
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           elevation: 5,
@@ -39,9 +37,20 @@ class TaskList extends StatelessWidget {
                 decoration: task.isCompleted ? TextDecoration.lineThrough : null,
               ),
             ),
-            subtitle: Text(
-              'Due: ${task.deadline.toLocal().toString().split(' ')[0]}',
-              style: const TextStyle(color: Colors.blueGrey),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Display Task Description
+                Text(
+                  task.description,
+                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                ),
+                // Display Due Date
+                Text(
+                  'Due: ${task.deadline.toLocal()}',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                ),
+              ],
             ),
             trailing: IconButton(
               icon: const Icon(Icons.delete, color: Colors.redAccent),

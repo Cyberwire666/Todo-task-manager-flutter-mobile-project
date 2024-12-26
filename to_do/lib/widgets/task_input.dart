@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
 import '../services/task_service.dart';
-import 'package:uuid/uuid.dart';
 
 class TaskInput extends StatefulWidget {
   @override
@@ -9,100 +9,125 @@ class TaskInput extends StatefulWidget {
 }
 
 class _TaskInputState extends State<TaskInput> {
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController deadlineController = TextEditingController();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _deadlineController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  DateTime? _selectedDeadline;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(12),
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
+    final authService = context.read<AuthService>();
+    final taskService = context.read<TaskService>();
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Form(
+        key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
-              controller: titleController,
-              decoration: InputDecoration(
+            // Title Field
+            TextFormField(
+              controller: _titleController,
+              decoration: const InputDecoration(
                 labelText: 'Task Title',
-                prefixIcon: const Icon(Icons.title, color: Colors.blueAccent),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                border: OutlineInputBorder(),
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a title';
+                }
+                return null;
+              },
             ),
-            const SizedBox(height: 15),
-            TextField(
-              controller: descriptionController,
-              decoration: InputDecoration(
-                labelText: 'Task Description',
-                prefixIcon: const Icon(Icons.description, color: Colors.blueAccent),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+            const SizedBox(height: 8),
+
+            // Description Field
+            TextFormField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Description',
+                border: OutlineInputBorder(),
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a description';
+                }
+                return null;
+              },
             ),
-            const SizedBox(height: 15),
-            TextField(
-              controller: deadlineController,
+            const SizedBox(height: 8),
+
+            // Deadline Field
+            TextFormField(
+              controller: _deadlineController,
               readOnly: true,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Deadline',
-                prefixIcon: const Icon(Icons.calendar_today, color: Colors.blueAccent),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                border: OutlineInputBorder(),
               ),
               onTap: () async {
                 final pickedDate = await showDatePicker(
                   context: context,
                   initialDate: DateTime.now(),
-                  firstDate: DateTime(2000),
+                  firstDate: DateTime.now(),
                   lastDate: DateTime(2100),
                 );
                 if (pickedDate != null) {
-                  deadlineController.text = pickedDate.toLocal().toString().split(' ')[0];
+                  setState(() {
+                    _selectedDeadline = pickedDate;
+                    _deadlineController.text = pickedDate.toLocal().toString().split(' ')[0]; // Format as yyyy-mm-dd
+                  });
                 }
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a deadline';
+                }
+                return null;
               },
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 8),
+
+            // Create Task Button
             ElevatedButton(
               onPressed: () {
-                if (titleController.text.isNotEmpty &&
-                    descriptionController.text.isNotEmpty &&
-                    deadlineController.text.isNotEmpty) {
-                  var task = Task(
-                    id: Uuid().v4(),
-                    title: titleController.text,
-                    description: descriptionController.text,
+                if (_formKey.currentState!.validate() && _selectedDeadline != null) {
+                  final userId = authService.user!.uid; // Use authenticated user's ID
+                  final newTask = Task(
+                    id: DateTime.now().toString(),
+                    title: _titleController.text,
+                    description: _descriptionController.text,
                     isCompleted: false,
-                    deadline: DateTime.parse(deadlineController.text),
+                    deadline: _selectedDeadline!, // Pass the selected deadline
+                    userId: userId,
                   );
-                  context.read<TaskService>().createTask(task);
 
-                  titleController.clear();
-                  descriptionController.clear();
-                  deadlineController.clear();
+                  taskService.createTask(newTask);
+
+                  // Clear the form
+                  _titleController.clear();
+                  _descriptionController.clear();
+                  _deadlineController.clear();
+                  setState(() {
+                    _selectedDeadline = null;
+                  });
                 }
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text(
-                'Add Task',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              child: const Text('Add Task'),
             ),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _deadlineController.dispose();
+    super.dispose();
   }
 }

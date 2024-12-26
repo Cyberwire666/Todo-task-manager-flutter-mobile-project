@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import '../services/task_service.dart';
 import '../widgets/task_input.dart';
 import '../widgets/task_list.dart';
+import 'login_screen.dart'; // Import the LoginScreen
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -13,9 +14,9 @@ class HomeScreen extends StatelessWidget {
     final authService = context.watch<AuthService>();
     final taskService = context.watch<TaskService>();
 
-    // Fetch tasks for the logged-in user if they are authenticated
-    if (authService.user != null && taskService.tasks.isEmpty) {
-      taskService.fetchTasks(authService.user!.uid);
+    // Listen to tasks for the logged-in user
+    if (authService.user != null) {
+      taskService.listenToTasks(authService.user!.uid);
     }
 
     return Scaffold(
@@ -32,8 +33,14 @@ class HomeScreen extends StatelessWidget {
             icon: const Icon(Icons.logout),
             tooltip: 'Logout',
             onPressed: () {
-              context.read<AuthService>().logout();
-              taskService.tasks.clear(); // Clear tasks locally when logout
+              authService.logout();
+              taskService.clearListener(); // Clear task listener when user logs out
+
+              // Navigate to login screen after logout
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
             },
           ),
         ],
@@ -50,9 +57,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             TaskInput(),
             const Divider(thickness: 2, color: Colors.white54),
-            Expanded(
-              child: TaskList(),
-            ), // Task list auto-updates when tasks change
+            Expanded(child: TaskList()),
           ],
         ),
       ),
