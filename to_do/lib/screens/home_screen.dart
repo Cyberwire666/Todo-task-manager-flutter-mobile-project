@@ -20,10 +20,17 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tasks'),
+        title: const Text(
+          'My Tasks',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
-            icon: const Icon(Icons.exit_to_app),
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
             onPressed: () {
               context.read<AuthService>().logout();
               taskService.tasks.clear(); // Clear tasks locally when logout
@@ -31,11 +38,23 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          TaskInput(),
-          Expanded(child: TaskList()),  // Task list auto-updates when tasks change
-        ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blueAccent, Colors.lightBlueAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Column(
+          children: [
+            TaskInput(),
+            const Divider(thickness: 2, color: Colors.white54),
+            Expanded(
+              child: TaskList(),
+            ), // Task list auto-updates when tasks change
+          ],
+        ),
       ),
     );
   }

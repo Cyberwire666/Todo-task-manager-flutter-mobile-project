@@ -15,68 +15,93 @@ class _TaskInputState extends State<TaskInput> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          // Title Input
-          TextField(
-            controller: titleController,
-            decoration: const InputDecoration(labelText: 'Title'),
-          ),
-          
-          // Description Input
-          TextField(
-            controller: descriptionController,
-            decoration: const InputDecoration(labelText: 'Description'),
-          ),
-          
-          // Deadline Input with Date Picker
-          TextField(
-            controller: deadlineController,
-            readOnly: true, // Disable manual editing
-            decoration: const InputDecoration(labelText: 'Deadline'),
-            onTap: () async {
-              final pickedDate = await showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
-              );
-              if (pickedDate != null) {
-                deadlineController.text = pickedDate.toLocal().toString().split(' ')[0]; // Format 'yyyy-mm-dd'
-              }
-            },
-          ),
-          
-          // Create Task Button
-          ElevatedButton(
-            onPressed: () {
-              if (titleController.text.isNotEmpty &&
-                  descriptionController.text.isNotEmpty &&
-                  deadlineController.text.isNotEmpty) {
-                    
-                // Create a Task object
-                var task = Task(
-                  id: Uuid().v4(),
-                  title: titleController.text,
-                  description: descriptionController.text,
-                  isCompleted: false,
-                  deadline: DateTime.parse(deadlineController.text),
+    return Card(
+      margin: const EdgeInsets.all(12),
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: InputDecoration(
+                labelText: 'Task Title',
+                prefixIcon: const Icon(Icons.title, color: Colors.blueAccent),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: descriptionController,
+              decoration: InputDecoration(
+                labelText: 'Task Description',
+                prefixIcon: const Icon(Icons.description, color: Colors.blueAccent),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: deadlineController,
+              readOnly: true,
+              decoration: InputDecoration(
+                labelText: 'Deadline',
+                prefixIcon: const Icon(Icons.calendar_today, color: Colors.blueAccent),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onTap: () async {
+                final pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
                 );
-                
-                // Call createTask method from TaskService
-                context.read<TaskService>().createTask(task);
-                
-                // Clear Text Controllers after Task is created
-                titleController.clear();
-                descriptionController.clear();
-                deadlineController.clear();
-              }
-            },
-            child: const Text('Create Task'),
-          ),
-        ],
+                if (pickedDate != null) {
+                  deadlineController.text = pickedDate.toLocal().toString().split(' ')[0];
+                }
+              },
+            ),
+            const SizedBox(height: 15),
+            ElevatedButton(
+              onPressed: () {
+                if (titleController.text.isNotEmpty &&
+                    descriptionController.text.isNotEmpty &&
+                    deadlineController.text.isNotEmpty) {
+                  var task = Task(
+                    id: Uuid().v4(),
+                    title: titleController.text,
+                    description: descriptionController.text,
+                    isCompleted: false,
+                    deadline: DateTime.parse(deadlineController.text),
+                  );
+                  context.read<TaskService>().createTask(task);
+
+                  titleController.clear();
+                  descriptionController.clear();
+                  deadlineController.clear();
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text(
+                'Add Task',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
