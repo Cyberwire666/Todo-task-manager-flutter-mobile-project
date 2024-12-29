@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
-import 'home_screen.dart'; // Navigate to Home screen after registration
+import 'home_screen.dart'; // Navigate to HomeScreen after successful registration
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -23,21 +23,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
         title: const Text('Create Account'),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.greenAccent,
       ),
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.all(20.0),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.blueAccent, Colors.lightBlueAccent],
+              colors: [Colors.greenAccent, Colors.lightGreen],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
           ),
           child: Center(
             child: Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
               elevation: 8,
               child: Padding(
                 padding: const EdgeInsets.all(25.0),
@@ -51,7 +53,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blueAccent,
+                          color: Colors.greenAccent,
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -59,7 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         controller: _emailController,
                         decoration: InputDecoration(
                           labelText: 'Email',
-                          prefixIcon: const Icon(Icons.email, color: Colors.blueAccent),
+                          prefixIcon: const Icon(Icons.email, color: Colors.green),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -69,6 +71,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           if (value == null || value.isEmpty) {
                             return 'Please enter an email';
                           }
+                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                            return 'Please enter a valid email address';
+                          }
                           return null;
                         },
                       ),
@@ -77,7 +82,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         controller: _passwordController,
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          prefixIcon: const Icon(Icons.lock, color: Colors.blueAccent),
+                          prefixIcon: const Icon(Icons.lock, color: Colors.green),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -86,6 +91,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter a password';
+                          }
+                          if (value.length < 6) {
+                            return 'Password must be at least 6 characters';
                           }
                           return null;
                         },
@@ -98,7 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: ElevatedButton(
                                 onPressed: _register,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blueAccent,
+                                  backgroundColor: Colors.greenAccent,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -113,12 +121,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 20),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pop(context);
+                          Navigator.pop(context); // Navigate back to login screen
                         },
                         child: const Text(
                           'Already have an account? Login',
                           style: TextStyle(
-                            color: Colors.blueAccent,
+                            color: Colors.greenAccent,
                             fontWeight: FontWeight.w500,
                             fontSize: 16,
                           ),
@@ -143,16 +151,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       try {
         await context.read<AuthService>().register(
-              _emailController.text,
-              _passwordController.text,
+              _emailController.text.trim(),
+              _passwordController.text.trim(),
             );
-        // Redirect to home screen after successful registration
+
+        // Redirect to HomeScreen after successful registration
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } catch (e) {
-        // Show error if registration fails
+        // Display error message for registration failure
         setState(() {
           _isLoading = false;
         });

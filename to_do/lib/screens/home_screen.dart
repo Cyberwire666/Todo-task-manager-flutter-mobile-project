@@ -23,20 +23,20 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'My Tasks',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
         ),
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.blueAccent,
+        elevation: 2,
+        backgroundColor: Colors.greenAccent,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Logout',
             onPressed: () {
               authService.logout();
-              taskService.clearListener(); // Clear task listener when user logs out
+              taskService.clearListener(); // Clear task listener on logout
 
-              // Navigate to login screen after logout
+              // Navigate back to LoginScreen
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -48,16 +48,33 @@ class HomeScreen extends StatelessWidget {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blueAccent, Colors.lightBlueAccent],
+            colors: [Colors.greenAccent, Colors.lightGreenAccent],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "Add Your Task:",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
             TaskInput(),
-            const Divider(thickness: 2, color: Colors.white54),
-            Expanded(child: TaskList()),
+            const Divider(
+              thickness: 2,
+              color: Colors.white70,
+            ),
+            Expanded(
+              child: TaskList(),
+            ),
           ],
         ),
       ),

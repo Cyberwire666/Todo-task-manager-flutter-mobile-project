@@ -14,14 +14,14 @@ class LoginScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Login'),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.greenAccent,
         elevation: 0,
       ),
       body: SingleChildScrollView(
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.blueAccent, Colors.lightBlueAccent],
+              colors: [Colors.greenAccent, Colors.lightGreen],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -41,7 +41,7 @@ class LoginScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blueAccent,
+                        color: Colors.greenAccent,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -49,7 +49,7 @@ class LoginScreen extends StatelessWidget {
                       controller: emailController,
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        prefixIcon: const Icon(Icons.email, color: Colors.blueAccent),
+                        prefixIcon: const Icon(Icons.email, color: Colors.green),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -61,7 +61,7 @@ class LoginScreen extends StatelessWidget {
                       controller: passwordController,
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        prefixIcon: const Icon(Icons.lock, color: Colors.blueAccent),
+                        prefixIcon: const Icon(Icons.lock, color: Colors.green),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -73,8 +73,8 @@ class LoginScreen extends StatelessWidget {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          final String email = emailController.text;
-                          final String password = passwordController.text;
+                          final String email = emailController.text.trim();
+                          final String password = passwordController.text.trim();
 
                           context.read<AuthService>().login(email, password).then((_) {
                             Navigator.pushReplacementNamed(context, '/home');
@@ -85,7 +85,7 @@ class LoginScreen extends StatelessWidget {
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
+                          backgroundColor: Colors.greenAccent,
                           padding: const EdgeInsets.symmetric(vertical: 15),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -105,7 +105,7 @@ class LoginScreen extends StatelessWidget {
                       child: const Text(
                         'Don’t have an account? Register',
                         style: TextStyle(
-                          color: Colors.blueAccent,
+                          color: Colors.greenAccent,
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
                         ),
